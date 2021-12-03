@@ -80,7 +80,7 @@ def get_ipststus(key="",ip="1.1.1.1"):
 
 # 设置返回包
 def set_res(req_data):
-
+    charset="gbk"
     response_data=bytes()
     # Set Header
     response_data+=req_data["Header"]['ID']+b"\x85\x80"+b"\x00\x01"+b"\x00\x01"+bytes(4)
@@ -123,7 +123,7 @@ def set_res(req_data):
     else:
         ipdata=get_ipststus(ip=ip)
 
-    lens=len(ipdata.encode("utf-8"))
+    lens=len(ipdata.encode(charset))
     if lens <16:
         txtlens="0"+hex(lens)[2:]
     else:
@@ -134,7 +134,7 @@ def set_res(req_data):
     else:
         datalens=hex(datalens)[2:]
 
-    response_data += bytes.fromhex("00"+datalens+txtlens)+ipdata.encode("utf-8")
+    response_data += bytes.fromhex("00"+datalens+txtlens)+ipdata.encode(charset)
     return response_data
 
 # 解析请求报文
@@ -222,7 +222,11 @@ if __name__ == "__main__":
         try:
             req_data=paser_req(request_data)
             print("-" * 30)
+            print("[+] req_data :", req_data)
+            print("-" * 30)
             response_data=set_res(req_data)
+            print("-" * 30)
+            print("[+] response_data :", response_data)
             print("-" * 30)
             s.sendto(response_data,clent)
         except Exception as e:
