@@ -2,6 +2,7 @@
 import socket
 import requests
 
+# 查询微步情报
 def get_ipststus(key="",ip="1.1.1.1"):
     url="https://api.threatbook.cn/v3/scene/ip_reputation?apikey={}&resource={}&lang=zh".format(key,ip)
     res_data=requests.get(url).json()
@@ -77,7 +78,7 @@ def get_ipststus(key="",ip="1.1.1.1"):
         file.write(ip+","+ipdata+"\n")
     return ipdata
 
-
+# 设置返回包
 def set_res(req_data):
 
     response_data=bytes()
@@ -100,13 +101,13 @@ def set_res(req_data):
         print("-" * 30)
         print(" [-] IP地址长度不够")
         print("-" * 30)
-        return response_data+bytes.fromhex("000100")
+        return response_data+bytes.fromhex("000100")# 返回空数据
     for x in ip.split("."):
         if int(x) >255:
             print("-" * 30)
             print(" [-] IP地址格式错误")
             print("-" * 30)
-            return response_data + bytes.fromhex("000100")
+            return response_data + bytes.fromhex("000100") # 返回空数据
     ipdata=''
     with open("ipstat.txt", "r") as file:
         ipstats=file.readlines()
@@ -136,6 +137,7 @@ def set_res(req_data):
     response_data += bytes.fromhex("00"+datalens+txtlens)+ipdata.encode("utf-8")
     return response_data
 
+# 解析请求报文
 def paser_req(request_data):
     req_data = dict()
     # 读取Header
@@ -173,6 +175,7 @@ def paser_req(request_data):
     # print(req_data)
     return req_data
 
+# 提取在数据包中的域名
 def get_domain(offset,bytes):
     domain = list()
     i = offset
@@ -187,6 +190,7 @@ def get_domain(offset,bytes):
     offset=i
     return ".".join(domain),offset
 
+# 把域名转换成dns协议中的数据包指定的字节格式
 def from_domaim_get_bytes(domain="qq.com"):
     domain_bytes=bytes()
     domains=domain.split(".")
@@ -200,17 +204,14 @@ def from_domaim_get_bytes(domain="qq.com"):
     return domain_bytes
 
 def test():
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # 创建 socket 对象
-    # s.bind(("127.0.0.1", 63551))
-    s.sendto(b'<\x9e\x01\x00\x00\x01\x00\x00\x00\x00\x00\x00\x04test\x04poee\x02ml\x00\x00\x10\x00\x01', ("127.0.0.1", 53))
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.sendto(b'aaaaaaaaaaaaaaa', ("127.0.0.1", 53))
 
 if __name__ == "__main__":
     # test()
 
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # 创建 socket 对象
-    host = socket.gethostname()  # 获取本地主机名
-    port = 53  # 设置端口
-    s.bind(("127.0.0.1", port))
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.bind(("0.0.0.0", 53))
     print("[+] DNS Server start .....")
     while True:
 
